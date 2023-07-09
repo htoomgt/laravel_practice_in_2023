@@ -37,6 +37,11 @@ To practice the access token, refreh token authentication at laravel with JWT pa
 2. config/jwt.php
 3. app/Http/Controllers/AuthController.php
 4. routes/api.php
+5. config/auth.php
+
+## Composer Packages Used
+
+1. The package `"php-open-source-saver/jwt-auth": "^2.1"` is used for JWT API authentication
 
 ## Referenced List
 
