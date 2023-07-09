@@ -19,6 +19,14 @@ class JWTMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $token = $request->bearerToken();
+
+        if (!$token) {
+            return response()->json([
+                'status' => 'bad request',
+                'message' => 'token not found'
+            ], 400);
+        }
 
         try {
             $user = JWTAuth::parseToken()->authenticate();
