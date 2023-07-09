@@ -1,6 +1,6 @@
 # Laravel JWT Access Token, Refresh Token Authentication
 
-To practice the access token, refreh token authentication at laravel with JWT package
+To practice the access token, refreh token authentication at laravel with JWT package.
 
 ## Setup
 
@@ -11,6 +11,22 @@ To practice the access token, refreh token authentication at laravel with JWT pa
 5. JWT config time to live (ttl) config
 6. migrate database `php artisan migrate`
 7. run the application `php artisan serve`
+
+## Generate Token and Refresh Token
+
+1. From queried or created user `$user = User::find(1); $token = Auth::login($user)`
+2. Token refresh from Auth `$token = Auth::refresh();`
+3. Token refresh from JWTAuth `$newAccessToken = JWTAuth::parseToken()->refresh();`
+
+## User Authentication
+
+1. Credential authentication `$credientials = $request->only('email', 'password');      $token =  Auth::attempt($credientials);`
+2. JWT token authentication `$user = JWTAuth::parseToken()->authenticate();`
+
+## Gist Note
+
+1. access token and refresh token can be used same token but access_token ttl and refresh token ttl can be different.
+2. token's ttl has to be provided in minutes
 
 ## Referenced List
 
