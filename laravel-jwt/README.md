@@ -27,6 +27,16 @@ To practice the access token, refreh token authentication at laravel with JWT pa
 
 1. access token and refresh token can be used same token but access_token ttl and refresh token ttl can be different.
 2. token's ttl has to be provided in minutes
+3. JWT both access token and refresh token expiration can be detected with TokenExpiredException
+4. From jwt token, we can get user by `$user = JWTAuth::setToken($newAccessToken)->toUser();`
+5. From Auth, we ccan get user by `$user = Auth::user();`
+
+## File to Check
+
+1. app/Http/Middlewares/JWTMiddleware.php
+2. config/jwt.php
+3. app/Http/Controllers/AuthController.php
+4. routes/api.php
 
 ## Referenced List
 
