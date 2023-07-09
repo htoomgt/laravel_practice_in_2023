@@ -27,19 +27,28 @@ class JWTMiddleware
             }
         } catch (TokenExpiredException $e) {
             if ($request->is("api/refresh")) {
-                $newAccessToken = JWTAuth::parseToken()->refresh();
-                $user = JWTAuth::setToken($newAccessToken)->toUser();
+                try {
+                    $newAccessToken = JWTAuth::parseToken()->refresh();
+                    $user = JWTAuth::setToken($newAccessToken)->toUser();
 
 
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'token has been refresh',
-                    'user' => $user,
-                    'authorization' => [
-                        'access_token' => $newAccessToken,
-                        'type' => 'bearer'
-                    ]
-                ], 200);
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'token has been refresh',
+                        'user' => $user,
+                        'authorization' => [
+                            'access_token' => $newAccessToken,
+                            'type' => 'bearer'
+                        ]
+                    ], 200);
+                } catch (TokenExpiredException $e) {
+                    return response()->json([
+                        'status' => 'expired',
+                        'message' => $e->getMessage()
+                    ], 401);
+                } catch (JWTException $e) {
+                    return response()->json(['message' => $e->getMessage()], 500);
+                }
             }
 
             return response()->json([
