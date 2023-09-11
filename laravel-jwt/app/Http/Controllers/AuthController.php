@@ -39,9 +39,10 @@ class AuthController extends Controller
         }
 
         $user = JWTAuth::user();
+        $userWithRoles = User::with('roles')->find($user->id);
         return response()->json([
             'status' => 'success',
-            'user' => $user,
+            'user' => $userWithRoles,
             'authorization' => [
                 'type' => 'Bearer',
                 'access_token' => $token,
