@@ -20,6 +20,13 @@ class JWTMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->bearerToken();
+        if ($request->is("api/refresh")) {
+            $requestContent = $request->all();
+            $authorization = $requestContent['headers']['Authorization'];
+            $token = $this->getBearerToken($authorization);
+        }
+
+
 
         if (!$token) {
             return response()->json([
@@ -55,6 +62,8 @@ class JWTMiddleware
                         'message' => $e->getMessage()
                     ], 401);
                 } catch (JWTException $e) {
+
+
                     return response()->json(['message' => $e->getMessage()], 500);
                 }
             }
@@ -64,10 +73,38 @@ class JWTMiddleware
                 'message' => $e->getMessage()
             ], 401);
         } catch (JWTException $e) {
+            if ($token) {
+                $user = JWTAuth::setToken($token)->toUser();
+                $newAccessToken = Auth::login($user);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'token has been refresh',
+                    'user' => $user,
+                    'authorization' => [
+                        'access_token' => $newAccessToken,
+                        'type' => 'bearer'
+                    ]
+                ], 200);
+            }
             return response()->json(['message' => $e->getMessage()], 500);
         }
 
 
         return $next($request);
+    }
+
+    public function getBearerToken($authorization)
+    {
+
+
+        $position = strrpos($authorization, 'Bearer ');
+
+
+        if ($position !== false) {
+            $header = substr($authorization, $position + 7);
+
+            return str_contains($header, ',') ? strstr($header, ',', true) : $header;
+        }
     }
 }
