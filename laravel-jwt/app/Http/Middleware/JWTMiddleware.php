@@ -20,8 +20,10 @@ class JWTMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->bearerToken();
-        if ($request->is("api/refresh")) {
+        // dd($token);
+        if (!$token && $request->is("api/refresh")) {
             $requestContent = $request->all();
+            // dd($requestContent);
             $authorization = $requestContent['headers']['Authorization'];
             $token = $this->getBearerToken($authorization);
         }
@@ -64,7 +66,7 @@ class JWTMiddleware
                 } catch (JWTException $e) {
 
 
-                    return response()->json(['message' => $e->getMessage()], 500);
+                    return response()->json(['messageA' => $e->getMessage()], 500);
                 }
             }
 
@@ -87,7 +89,7 @@ class JWTMiddleware
                     ]
                 ], 200);
             }
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['messageB' => $e->getMessage()], 500);
         }
 
 

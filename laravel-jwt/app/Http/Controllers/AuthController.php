@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Throwable;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('jwt.verify:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
 
@@ -98,12 +99,34 @@ class AuthController extends Controller
     public function refresh()
     {
 
+        try {
+            $token = JWTAuth::getToken();
+
+            if (!$token) {
+                return response()->json([
+                    'status' => 'bad request',
+                    'message' => 'token not found'
+                ], 400);
+            }
+
+            $newAccessToken = JWTAuth::refresh($token);
+            $user = JWTAuth::setToken($newAccessToken)->toUser();
+        } catch (Throwable $th) {
+            return response()->json([
+                'status' => 'JWT token error',
+                'message' => $th->getMessage()
+            ], 400);
+        }
+
+
+
+
         return response()->json([
             'status' => 'success',
-            'user' =>  Auth::user(),
+            'user' => $user,
             'authorization' => [
-                'access_token' => Auth::refresh(),
-                'type' => 'Bearer'
+                'token' => $newAccessToken,
+                'type' => 'bearer',
             ]
         ]);
     }
