@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Throwable;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -71,20 +72,28 @@ class AuthController extends Controller
         ]);
     }
 
-    public function refresh(Request $request)
+    public function refresh()
     {
 
-        $token = JWTAuth::getToken();
+        try {
+            $token = JWTAuth::getToken();
 
-        if (!$token) {
+            if (!$token) {
+                return response()->json([
+                    'status' => 'bad request',
+                    'message' => 'token not found'
+                ], 400);
+            }
+
+            $newAccessToken = JWTAuth::refresh($token);
+            $user = JWTAuth::setToken($newAccessToken)->toUser();
+        } catch (Throwable $th) {
             return response()->json([
-                'status' => 'bad request',
-                'message' => 'token not found'
+                'status' => 'JWT token error',
+                'message' => $th->getMessage()
             ], 400);
         }
 
-        $newAccessToken = JWTAuth::refresh($token);
-        $user = JWTAuth::setToken($newAccessToken)->toUser();
 
 
 
