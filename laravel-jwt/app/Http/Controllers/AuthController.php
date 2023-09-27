@@ -5,16 +5,20 @@ namespace App\Http\Controllers;
 use Throwable;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Traits\BearerToken;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Token;
 
 class AuthController extends Controller
 {
+    use BearerToken;
+
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('jwt.verify:api', ['except' => ['login', 'register', 'refresh']]);
     }
 
 
@@ -96,11 +100,26 @@ class AuthController extends Controller
         ]);
     }
 
-    public function refresh()
+    public function refresh(Request $request)
     {
-
+        $token = null;
         try {
+            // $token = JWTAuth::getToken();
+            // dd($token);
+
+            // dd("be happy!");
+            // if (!$token) {
+            $requestHeaders = $request->headers->all();
+            // dd($requestHeaders);
+            // // return response()->json($requestHeaders);
+            // dd($requestHeaders);
+            $authorization = $requestHeaders['authorization'][0];
+            $token = $this->getBearerToken($authorization);
+            // dd($token);
+            JWTAuth::setToken($token);
             $token = JWTAuth::getToken();
+            // dd($token);
+            // }
 
             if (!$token) {
                 return response()->json([
@@ -110,11 +129,13 @@ class AuthController extends Controller
             }
 
             $newAccessToken = JWTAuth::refresh($token);
+            // dd($newAccessToken);
             $user = JWTAuth::setToken($newAccessToken)->toUser();
         } catch (Throwable $th) {
             return response()->json([
                 'status' => 'JWT token error',
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
+                'requestHeaders' => $requestHeaders
             ], 400);
         }
 

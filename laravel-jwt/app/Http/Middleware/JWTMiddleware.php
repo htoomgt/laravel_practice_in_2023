@@ -20,11 +20,10 @@ class JWTMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->bearerToken();
-        // dd($token);
-        if (!$token && $request->is("api/refresh")) {
-            $requestContent = $request->all();
-            // dd($requestContent);
-            $authorization = $requestContent['headers']['Authorization'];
+
+        if (!$token) {
+            $requestHeaders = request()->headers->all();
+            $authorization = $requestHeaders['authorization'][0];
             $token = $this->getBearerToken($authorization);
         }
 
@@ -38,58 +37,24 @@ class JWTMiddleware
         }
 
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            // $user = JWTAuth::parseToken()->authenticate();
+
+            $user = JWTAuth::setToken($token)->toUser();
+            $newAccessToken = Auth::login($user);
+
             if (!$user) {
                 return response()->json(['message' => 'user not found'], 400);
             }
         } catch (TokenExpiredException $e) {
-            if ($request->is("api/refresh")) {
-                try {
-                    $newAccessToken = JWTAuth::parseToken()->refresh();
-                    $user = JWTAuth::setToken($newAccessToken)->toUser();
 
-
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'token has been refresh',
-                        'user' => $user,
-                        'authorization' => [
-                            'access_token' => $newAccessToken,
-                            'type' => 'bearer'
-                        ]
-                    ], 200);
-                } catch (TokenExpiredException $e) {
-                    return response()->json([
-                        'status' => 'expired',
-                        'message' => $e->getMessage()
-                    ], 401);
-                } catch (JWTException $e) {
-
-
-                    return response()->json(['messageA' => $e->getMessage()], 500);
-                }
-            }
 
             return response()->json([
-                'status' => 'expired',
+                'status' => 'token expired',
                 'message' => $e->getMessage()
             ], 401);
         } catch (JWTException $e) {
-            if ($token) {
-                $user = JWTAuth::setToken($token)->toUser();
-                $newAccessToken = Auth::login($user);
 
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'token has been refresh',
-                    'user' => $user,
-                    'authorization' => [
-                        'access_token' => $newAccessToken,
-                        'type' => 'bearer'
-                    ]
-                ], 200);
-            }
-            return response()->json(['messageB' => $e->getMessage()], 500);
+            return response()->json(['status' => 'token error', 'message' => $e->getMessage()], 400);
         }
 
 
