@@ -44,6 +44,17 @@ class ProductController extends Controller
     {
         $product->delete();
 
-        return response()->json(null, 204);
+        $response = [
+            'status' => 'success',
+            'message' => 'Product deleted successfully.'
+        ];
+
+        return response()->json($response, 204);
+    }
+
+    public function searchByName(Request $request)
+    {
+        $name = $request->input('name');
+        return Product::where('name', 'like', '%' . $name . '%')->get();
     }
 }
