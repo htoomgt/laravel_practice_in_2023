@@ -23,12 +23,23 @@ class ProductController extends Controller
     {
         $product = Product::create($request->all());
 
-        return response()->json($product, 201);
+        $response = [
+            "status" => "success",
+            "message" => "Product created successfully.",
+            "data" => $product
+        ];
+
+        return response()->json($response, 201);
     }
 
     public function show(Product $product)
     {
-        return $product;
+        $response = [
+            "status" => "success",
+            "message" => "Product retrieved successfully.",
+            "data" => $product
+        ];
+        return response()->json($response, 200);
     }
 
 
@@ -36,20 +47,28 @@ class ProductController extends Controller
     {
         $product->update($request->all());
 
-        return response()->json($product, 200);
+        $response = [
+            "status" => "success",
+            "message" => "Product updated successfully.",
+            "data" => $product
+        ];
+
+        return response()->json($response, 200);
     }
 
 
     public function destroy(Product $product)
     {
+        $productId = $product->id;
         $product->delete();
 
+
         $response = [
-            'status' => 'success',
-            'message' => 'Product deleted successfully.'
+            "status" => 'success',
+            "message" => "Product with id {$productId} deleted successfully."
         ];
 
-        return response()->json($response, 204);
+        return response()->json($response, 200);
     }
 
     public function searchByName(Request $request)
