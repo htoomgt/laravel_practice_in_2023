@@ -37,4 +37,33 @@ class AuthController extends Controller
 
         return response()->json($response, 201);
     }
+
+    public function login(Request $request)
+    {
+        $fields = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string'
+        ]);
+
+        $user = User::where('email', $fields['email'])->first();
+
+        if (!$user || !Hash::check($fields['password'], $user->password)) {
+            return response([
+                'message' =>  "Bad Credentials"
+            ]);
+        }
+
+        $token = $user->createToken('myapptoken')->plainTextToken;
+
+        $response = [
+            "status" => "success",
+            "message" => "User created successfully.",
+            "data" => [
+                "user" => $user,
+                "access_token" => $token
+            ]
+        ];
+
+        return response()->json($response, 201);
+    }
 }
