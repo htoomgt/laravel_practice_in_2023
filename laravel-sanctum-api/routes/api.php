@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 
+enum TokenAbility: string
+{
+    case ISSUE_ACCESS_TOKEN = 'issue-access-token';
+    case ACCESS_API = 'access-api';
+}
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -40,8 +45,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put("/products/{product}", [ProductController::class, 'update'])->name('product.update');
 
     Route::delete("/products/{product}", [ProductController::class, 'destroy'])->name('product.delete');
+
+    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 });
 
 // Auth Routes
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+
+Route::post('/refresh', [AuthController::class, 'refreshToken'])
+->middleware([
+    'auth:sanctum',
+    'ability:'.TokenAbility::ISSUE_ACCESS_TOKEN->value,    
+])
+->name('auth.refreshToken');
