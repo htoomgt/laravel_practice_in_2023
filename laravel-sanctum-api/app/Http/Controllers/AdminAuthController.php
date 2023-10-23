@@ -7,11 +7,7 @@ use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 use DateTime;
 
-enum TokenAbility: string
-{
-    case ISSUE_ACCESS_TOKEN = 'issue-access-token';
-    case ACCESS_API = 'access-api';
-}
+
 
 class AdminAuthController extends Controller
 {
@@ -29,8 +25,8 @@ class AdminAuthController extends Controller
             'password' => bcrypt($fields['password'])
         ]);
 
-        $adminAccessToken = $admin->createToken('admin-access-token', [TokenAbility::ACCESS_API->value], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
-        $adminRefreshToken = $admin->createToken('admin-refresh-token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+        $adminAccessToken = $admin->createToken('admin-access-token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
+        $adminRefreshToken = $admin->createToken('admin-refresh-token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
 
         $response = [
             "status" => "success",
@@ -67,8 +63,8 @@ class AdminAuthController extends Controller
             ]);
         }
 
-        $adminAccessToken = $admin->createToken('admin-access-token', [TokenAbility::ACCESS_API->value], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
-        $adminRefreshToken = $admin->createToken('admin-refresh-token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+        $adminAccessToken = $admin->createToken('admin-access-token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
+        $adminRefreshToken = $admin->createToken('admin-refresh-token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
 
         $response = [
             "status" => "success",
@@ -107,8 +103,8 @@ class AdminAuthController extends Controller
         auth()->user()->tokens()->delete();
         $admin = auth()->user();
 
-        $adminAccessToken = $admin->createToken('admin-access-token', [TokenAbility::ACCESS_API->value], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
-        $adminRefreshToken = $admin->createToken('admin-refresh-token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+        $adminAccessToken = $admin->createToken('admin-access-token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
+        $adminRefreshToken = $admin->createToken('admin-refresh-token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
 
         $response = [
             "status" => "success",

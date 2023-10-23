@@ -7,11 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\AdminAuthController;
 
-enum TokenAbility: string
-{
-    case ISSUE_ACCESS_TOKEN = 'issue-access-token';
-    case ACCESS_API = 'access-api';
-}
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -58,7 +54,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/refresh', [AuthController::class, 'refreshToken'])
 ->middleware([
     'auth:api',
-    'ability:'.TokenAbility::ISSUE_ACCESS_TOKEN->value,
+    'ability:'.config('sanctum.issue_access_token'),
 ])
 ->name('auth.refreshToken');
 
@@ -86,7 +82,7 @@ Route::post('register-admin', [AdminAuthController::class, 'register'])->name('a
 Route::post('admin-login', [AdminAuthController::class, 'login'])->name('adminAuth.login');
 Route::post('admin-logout', [AdminAuthController::class, 'logout'])->name('adminAuth.logout')->middleware(['auth:admin-api']);
 Route::post('admin-refresh-token', [AdminAuthController::class, 'refreshToken'])->name('adminAuth.refreshToken')
-->middleware(['auth:admin-api', 'ability:'.TokenAbility::ISSUE_ACCESS_TOKEN->value]);
+->middleware(['auth:admin-api', 'ability:'.config('sanctum.issue_access_token')]);
 
 /** Admin Auth Routes end */
 

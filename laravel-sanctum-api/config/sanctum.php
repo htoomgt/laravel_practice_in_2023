@@ -49,6 +49,11 @@ return [
     'expiration' => 60,
     'rt_expiration' => 7 * 24 * 60,
 
+    'token_ability' => [
+        'issue_access_token' => 'issue-access-token',
+        'access_api' => 'access-api'
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Sanctum Middleware

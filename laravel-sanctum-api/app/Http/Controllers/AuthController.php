@@ -7,11 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use DateTime;
 
-enum TokenAbility: string
-{
-    case ISSUE_ACCESS_TOKEN = 'issue-access-token';
-    case ACCESS_API = 'access-api';
-}
+
 
 class AuthController extends Controller
 {
@@ -30,14 +26,21 @@ class AuthController extends Controller
             'password' => bcrypt($fields['password'])
         ]);
 
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        
+
+        $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
 
         $response = [
             "status" => "success",
             "message" => "User created successfully.",
             "data" => [
                 "user" => $user,
-                "access_token" => $token
+                "token_type" => 'bearer',
+                "access_token" => $accessToken,
+                "refresh_token" => $refreshToken,
+                "access_token_expiration" => config('sanctum.expiration')." minutes",
+                "refresh_token_expiration" => config('sanctum.rt_expiration')." minutes"
             ]
         ];
 
@@ -61,14 +64,15 @@ class AuthController extends Controller
 
         // $token = $user->createToken('myapptoken')->plainTextToken;
 
-        $accessToken = $user->createToken('access_token', [TokenAbility::ACCESS_API->value], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
-        $refreshToken = $user->createToken('refresh_token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+        $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
 
         $response = [
             "status" => "success",
             "message" => "User created successfully.",
             "data" => [
                 "user" => $user,
+                "token_type" => 'bearer',
                 "access_token" => $accessToken,
                 "refresh_token" => $refreshToken,
                 "access_token_expiration" => config('sanctum.expiration')." minutes",
@@ -98,14 +102,15 @@ class AuthController extends Controller
         $user = auth()->user();
 
 
-        $accessToken = $user->createToken('access_token', [TokenAbility::ACCESS_API->value], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
-        $refreshToken = $user->createToken('refresh_token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+        $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
 
         $response = [
             "status" => "success",
             "message" => "token refreshed successfully.",
             "data" => [
                 "user" => $user,
+                "token_type" => 'bearer',
                 "access_token" => $accessToken,
                 "refresh_token" => $refreshToken,
                 "access_token_expiration" => config('sanctum.expiration')." minutes",
