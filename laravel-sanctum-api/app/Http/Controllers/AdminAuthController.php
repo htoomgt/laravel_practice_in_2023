@@ -102,5 +102,30 @@ class AdminAuthController extends Controller
         return response()->json($response, 200);
     }
 
+    public function refreshToken()
+    {
+        auth()->user()->tokens()->delete();
+        $admin = auth()->user();
+
+        $adminAccessToken = $admin->createToken('admin-access-token', [TokenAbility::ACCESS_API->value], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
+        $adminRefreshToken = $admin->createToken('admin-refresh-token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+
+        $response = [
+            "status" => "success",
+            "message" => "Admin Tokens have been refreshed successfully.",
+            "data" => [
+                "admin" => $admin,
+                'token_type' => 'Bearer',
+                "access_token" => $adminAccessToken,
+                "refresh_token" => $adminRefreshToken,
+                'access_token_expires_at' => config('sanctum.expiration')." minutes",
+                'refresh_token_expires_at' => config('sanctum.rt_expiration')." minutes"
+
+            ]
+        ];
+
+        return response()->json($response, 201);
+    }
+
     
 }

@@ -85,6 +85,9 @@ Route::group(['middleware' => ['auth:admin-api']], function(){
 Route::post('register-admin', [AdminAuthController::class, 'register'])->name('adminAuth.register');
 Route::post('admin-login', [AdminAuthController::class, 'login'])->name('adminAuth.login');
 Route::post('admin-logout', [AdminAuthController::class, 'logout'])->name('adminAuth.logout')->middleware(['auth:admin-api']);
+Route::post('admin-refresh-token', [AdminAuthController::class, 'refreshToken'])->name('adminAuth.refreshToken')
+->middleware(['auth:admin-api', 'ability:'.TokenAbility::ISSUE_ACCESS_TOKEN->value]);
+
 /** Admin Auth Routes end */
 
 

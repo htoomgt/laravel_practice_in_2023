@@ -92,6 +92,19 @@ class BlogPostController extends Controller
     public function deleteById($id)
     {
         $blogPost = BlogPost::find($id);
+
+        if(!$blogPost){
+            
+
+            $response = [
+                'status' => "not found",
+                "message" => "blog post not found for given id"
+            ];
+
+            return response($response, 404);
+            
+        }
+        
         $blogPost->delete();
 
         $response = [
