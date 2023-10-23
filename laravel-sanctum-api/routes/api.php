@@ -68,9 +68,16 @@ Route::post('/refresh', [AuthController::class, 'refreshToken'])
 
 Route::get('/blog-posts', [BlogPostController::class, 'index'])->name('blogPost.showAll');
 Route::get('/blog-posts/{id}', [BlogPostController::class, 'show'])->name('blogPost.show');
-Route::post('/blog-posts', [BlogPostController::class, 'store'])->name('blogPost.store');
-Route::put('/blog-posts/{id}', [BlogPostController::class, 'update'])->name('blogPost.update');
-Route::delete('/blog-posts/{id}', [BlogPostController::class, 'destroy'])->name('blogPost.delete');
+
+Route::group(['middleware' => ['auth:admin-api']], function(){
+    Route::post('/blog-posts', [BlogPostController::class, 'store'])->name('blogPost.store');
+    Route::put('/blog-posts/{id}', [BlogPostController::class, 'update'])->name('blogPost.update');
+    Route::delete('/blog-posts/{id}', [BlogPostController::class, 'deleteById'])->name('blogPost.delete');
+});
+
+
+
+
 
 /**Blog Post Routes end */
 

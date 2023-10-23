@@ -68,6 +68,7 @@ class BlogPostController extends Controller
 
     public function updateById(Request $request, $id)
     {
+        
         $fields = $request->validate([
             'title' => 'required|string',
             'author_id' => 'required|integer',
