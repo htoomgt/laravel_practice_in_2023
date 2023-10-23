@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\BlogPostController;
+use App\Http\Controllers\AdminAuthController;
 
 enum TokenAbility: string
 {
@@ -38,7 +40,7 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 Route::post("/products/searchByName", [ProductController::class, 'searchByName'])->name('product.searchByName');
 
 // Protected Route
-Route::group(['middleware' => ['auth:sanctum']], function () {
+Route::group(['middleware' => ['auth:api']], function () {
 
     Route::post('/products', [ProductController::class, 'store'])->name('product.store');
 
@@ -55,7 +57,28 @@ Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 
 Route::post('/refresh', [AuthController::class, 'refreshToken'])
 ->middleware([
-    'auth:sanctum',
-    'ability:'.TokenAbility::ISSUE_ACCESS_TOKEN->value,    
+    'auth:api',
+    'ability:'.TokenAbility::ISSUE_ACCESS_TOKEN->value,
 ])
 ->name('auth.refreshToken');
+
+
+
+/**Blog Post Routes start*/
+
+Route::get('/blog-posts', [BlogPostController::class, 'index'])->name('blogPost.showAll');
+Route::get('/blog-posts/{id}', [BlogPostController::class, 'show'])->name('blogPost.show');
+Route::post('/blog-posts', [BlogPostController::class, 'store'])->name('blogPost.store');
+Route::put('/blog-posts/{id}', [BlogPostController::class, 'update'])->name('blogPost.update');
+Route::delete('/blog-posts/{id}', [BlogPostController::class, 'destroy'])->name('blogPost.delete');
+
+/**Blog Post Routes end */
+
+/** Admin Auth Routes start */
+Route::post('register-admin', [AdminAuthController::class, 'register'])->name('adminAuth.register');
+Route::post('admin-login', [AdminAuthController::class, 'login'])->name('adminAuth.login');
+Route::post('admin-logout', [AdminAuthController::class, 'logout'])->name('adminAuth.logout')->middleware(['auth:admin-api']);
+/** Admin Auth Routes end */
+
+
+
