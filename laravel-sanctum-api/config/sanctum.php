@@ -46,8 +46,8 @@ return [
     |
     */
 
-    'expiration' => 60,
-    'rt_expiration' => 7 * 24 * 60,
+    'expiration' => env('SANCTUM_ACCESS_TOKEN_TTL', 60),
+    'rt_expiration' => env('SANCTUM_REFRESH_TOKEN_TTL', 20160),
 
     'token_ability' => [
         'issue_access_token' => 'issue-access-token',

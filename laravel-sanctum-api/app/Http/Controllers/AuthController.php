@@ -28,8 +28,19 @@ class AuthController extends Controller
 
         
 
-        $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
-        $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+        $accessToken = $user
+            ->createToken(
+                'access_token', 
+                [config('sanctum.token_ability.access_api')], 
+                new DateTime(config('sanctum.expiration'). " minutes"))
+            ->plainTextToken;
+        
+        $refreshToken = $user
+            ->createToken(
+                'refresh_token', 
+                [config('sanctum.token_ability.issue_access_token')], 
+                new DateTime(config('sanctum.rt_expiration'). " minutes"))
+            ->plainTextToken;
 
         $response = [
             "status" => "success",

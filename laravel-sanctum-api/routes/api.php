@@ -35,7 +35,7 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 
 Route::post("/products/searchByName", [ProductController::class, 'searchByName'])->name('product.searchByName');
 
-// Protected Route
+// Protected Routes
 Route::group(['middleware' => ['auth:api']], function () {
 
     Route::post('/products', [ProductController::class, 'store'])->name('product.store');
