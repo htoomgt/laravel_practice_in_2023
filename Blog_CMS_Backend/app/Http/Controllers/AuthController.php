@@ -17,7 +17,7 @@ class AuthController extends BaseController
 
     public function __construct(UserRepositoryInterface $userRepository)
     {
-        parent::construct();
+        parent::__construct();
 
         $this->userRepository = $userRepository;
     }
@@ -40,7 +40,7 @@ class AuthController extends BaseController
         }
 
         try{
-            $validatedData = $request->validated();
+            $validatedData = $validator->validated();
             $validatedData['password'] = Hash::make($validatedData['password']);
 
             $user = $this->userRepository->create($validatedData);
@@ -92,7 +92,7 @@ class AuthController extends BaseController
         try{
             $user =  $this->userRepository->getBySearchFields(['email' => $request->email])->first(); 
 
-            if (!$user || !Hash::check($fields['password'], $user->password)) {
+            if (!$user || !Hash::check($request['password'], $user->password)) {
                 
                 $this->setResponseInfo('invalid', '', '', '', 'email or password wrongs');
                 return response()->json($this->response, $this->httpStatus);
@@ -140,8 +140,7 @@ class AuthController extends BaseController
         $user = auth()->user();
 
         try{
-            $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
-            $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
+            
 
             $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
             $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;

@@ -30,12 +30,12 @@ class UserRepository implements UserRepositoryInterface
 
     public function show(int $id)
     {
-        return User::find($id);
+        return User::with(['roles'])->find($id);
     }
 
     public function getBySearchFields($searchData)
     {
-        return User::where($searchData)->get();
+        return User::with(['roles'])->where($searchData)->get();
     }
 
 }

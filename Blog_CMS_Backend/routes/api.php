@@ -24,7 +24,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 
 Route::group(['middleware' => [
     'auth:api',
-    'ability:'.config('sanctum.access_api'),
+    'ability:'.config('sanctum.token_ability.access_api'),
     ]], function(){
     
     
@@ -33,10 +33,10 @@ Route::group(['middleware' => [
 });
 
 
-Route::post('/refresh', [AuthController::class, 'refreshToken'])
+Route::post('/refresh', [AuthController::class, 'refreshTokens'])
 ->middleware([
     'auth:api',
-    'ability:'.config('sanctum.issue_access_token'),
+    'ability:'.config('sanctum.token_ability.issue_access_token'),
 ])
 ->name('auth.refreshToken');
 
