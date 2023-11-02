@@ -7,7 +7,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function all()
+    public function all($page, $limit)
     {
         return User::all();
     }
@@ -17,13 +17,18 @@ class UserRepository implements UserRepositoryInterface
         return User::create($data);
     }
 
-    public function update(array $data, int $id)
+    public function updateById(array $data, int $id)
     {
-        $record = User::find($id);
-        return $record->update($data);
+        $user = User::find($id);
+        
+        $role = $data['role'];
+        data_forget($data, 'role');
+        $user->syncRoles([$role]);
+
+        return $user->update($data);
     }
 
-    public function delete(int $id)
+    public function deleteById(int $id)
     {
         return User::destroy($id);
     }

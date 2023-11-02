@@ -23,6 +23,14 @@ class AuthController extends BaseController
     }
 
 
+    /**
+     * To register the subscriber from public API
+     * @author Htoo Maung Thait
+     * @since 2023-11-02
+     * @param Request $request
+     * @return JSON
+     * 
+     */
     public function subscriberRegister(Request $request)
     {
 
@@ -73,7 +81,13 @@ class AuthController extends BaseController
         return response()->json($this->response, $this->httpStatus);
     }
 
-
+    /**
+     * To login from the public API
+     * @author Htoo Maung Thait
+     * @since 2023-11-02
+     * @param Request $request
+     * @return JSON
+     */
     public function login(Request $request)
     {
         
@@ -124,6 +138,13 @@ class AuthController extends BaseController
         return response()->json($this->response, $this->httpStatus);
     }
 
+    /**
+     * To logout from the authenticated API
+     * @author Htoo Maung Thait
+     * @since 2023-11-02
+     * @param Request $request
+     * @return JSON
+     */
     public function logout()
     {
         auth()->user()->tokens()->delete();
@@ -133,7 +154,13 @@ class AuthController extends BaseController
         return response()->json($this->response, $this->httpStatus);
     }
 
-
+    /**
+     * To refresh from the authenticated API
+     * @author Htoo Maung Thait
+     * @since 2023-11-02
+     * @param Request $request
+     * @return JSON
+     */
     public function refreshTokens()
     {
         auth()->user()->tokens()->delete();
