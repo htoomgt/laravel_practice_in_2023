@@ -27,9 +27,9 @@ Route::group(['middleware' => [
     'auth:api',
     'ability:'.config('sanctum.token_ability.access_api'),
     ]], function(){
-    
-    
-    
+
+
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
 
@@ -41,6 +41,13 @@ Route::group(['middleware' => [
     Route::put('/users/{id}', [UserController::class, 'updateUserById'])->name('user.updateById');
     Route::delete('/users/{id}', [UserController::class, 'deleteById'])->name('user.deleteByid');
     Route::post('/users/customSearch', [UserController::class, 'searchByFields'])->name('user.customSearch');
+
+    //blog api
+    Route::get('/blogs', [BlogController::class, 'index'])->name('blog.getAll');
+    Route::post('/blogs', [BlogController::class, 'store'])->name('blog.create');
+    Route::get('/blogs/{id}', [BlogController::class, 'showById'])->name('blog.showById');
+    Route::put('/blogs/{id}', [BlogController::class, 'updateById'])->name('blog.updateById');
+    Route::delete('/blogs/{id}', [BlogController::class, 'deleteById'])->name('blog.deleteByid');
 
 
 
