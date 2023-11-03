@@ -3,13 +3,25 @@
 namespace App\Repositories;
 
 use App\Models\Blog;
+use Illuminate\Support\Facades\Schema;
 use App\Repositories\Interfaces\BlogRepositoryInterface;
 
 class BlogRepository implements BlogRepositoryInterface
 {
-    public function all()
+    public function getAll($page, $limit, $search)
     {
-        return Blog::all();
+        $query = Blog::with(['user']);
+
+
+        foreach($search as $key => $value){
+
+            if(Schema::table('blogs', $key)){
+                $query->where($key, 'like', "%".$value."%");
+            }
+
+        }
+
+        return $query->paginate($limit, ['*'], 'page', $page);
     }
 
     public function create(array $data)
@@ -23,12 +35,12 @@ class BlogRepository implements BlogRepositoryInterface
         return $record->update($data);
     }
 
-    public function delete(int $id)
+    public function deleteById(int $id)
     {
         return Blog::destroy($id);
     }
 
-    public function show(int $id)
+    public function showById(int $id)
     {
         return Blog::find($id);
     }
