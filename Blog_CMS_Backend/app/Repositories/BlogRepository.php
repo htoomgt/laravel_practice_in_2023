@@ -18,7 +18,7 @@ class BlogRepository implements BlogRepositoryInterface
      */
     public function getAll($page, $limit, $search)
     {
-        $query = Blog::with(['user']);
+        $query = Blog::with(['author']);
 
 
         foreach($search as $key => $value){

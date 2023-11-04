@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Throwable;
 use Illuminate\Http\Request;
 use App\Repositories\BlogRepository;
-use Dotenv\Validator;
+use Illuminate\Support\Facades\Validator;
+
 
 class BlogController extends BaseController
 {
@@ -43,7 +44,12 @@ class BlogController extends BaseController
         try {
             $data = $this->blogRepository->getAll($page, $limit, $search);
 
+            foreach($data as $row){
+                $row->image_file = url("/")."/storage/blog_imgs/".$row->image_file;
+            }
+
             if ($data) {
+                $this->response['data'] = $data;
                 $this->setResponseInfo('success', 'Blogs can be queried successfully,', [], '', '');
             } else {
                 $this->setResponseInfo('no data', '', [], 'No blog can be found', '');
@@ -98,6 +104,7 @@ class BlogController extends BaseController
             $blog = $this->blogRepository->create($validatedData);
 
             if ($blog) {
+            
                 $this->setResponseInfo('success', 'Blog created successfully', [], '', '');
             } else {
                 $this->setResponseInfo('no data', '', [], 'No blog can be found', '');
@@ -121,8 +128,9 @@ class BlogController extends BaseController
      */
     public function updateById(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|integer|exists:blogs,id',
+        
+        // dd($request->all());
+        $validator = Validator::make($request->all(), [            
             'title' => 'required|string',
             'short_content' => 'required|string',
             'content_body' => 'required|string',
@@ -206,16 +214,18 @@ class BlogController extends BaseController
      * @param int $id
      * @return json
      */
-    public function getById($id)
+    public function showById($id)
     {
         if (!$id) {
             $this->setResponseInfo('invalid', ['id' => 'no id is provided'], '', '', '');
             return response()->json($this->response, $this->httpStatus);
         }
         try {
-            $status = $this->blogRepository->showById($id);
+            $blog = $this->blogRepository->showById($id);
 
-            if ($status) {
+            if ($blog) {
+                $blog->image_file = url("/")."/storage/blog_imgs/".$blog->image_file;
+                $this->response['data'] = $blog;
                 $this->setResponseInfo('success', 'Blog is queried successfully', [], '', '');
             } else {
                 $this->setResponseInfo('no data', '', [], 'No blog can be found ', '');
