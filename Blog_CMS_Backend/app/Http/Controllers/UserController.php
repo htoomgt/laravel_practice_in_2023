@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Throwable;
@@ -23,14 +22,24 @@ class UserController extends BaseController
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * List all users with pagination and optional custom search
+     *
+     * @author Htoo Maung Thait
+     * @since 2023-11-03
+     * @param Request $request['page', 'limit', 'search']
+     *
+     * @return json
+     */
     public function index(Request $request)
     {
-        $page = $request->page ?? 1;
-        
-        $limit = $request->limit ?? 10;
+
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 10);
+        $search = $request->input('search', []);
 
         try{
-            $users = $this->userRepository->all($page, $limit);
+            $users = $this->userRepository->all($page, $limit, $search);
 
             $this->response['data'] = $users;
 
@@ -38,26 +47,33 @@ class UserController extends BaseController
         }catch(Throwable $th){
             Log::error("Cannot query user detail => ". $th->getMessage());
             $this->setResponseInfo('error', '', '', '', $th->getMessage());
-        }        
-        
+        }
+
 
         return response()->json($this->response, $this->httpStatus);
     }
 
-
+    /**
+     * User registration with role assignment
+     * @author Htoo Maung Thait
+     * @since 2023-11-03
+     *
+     * @param Request $request
+     * @return void
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'role' => 'required|string|exists:roles,name',
-            'password' => 'required|string',
-            'password_confirmation' => 'required|string'
+            'password' => 'required|string|min:6',
+            'password_confirmation' => 'required_if:password|string|min:6'
         ]);
 
         if($validator->fails()){
 
-            
+
             $this->setResponseInfo('invalid', '', $validator->errors()->toArray(), '', '');
             return response()->json($this->response, $this->httpStatus);
         }
@@ -95,13 +111,22 @@ class UserController extends BaseController
         return response()->json($this->response, $this->httpStatus);
     }
 
+    /**
+     * show User By user id
+     *
+     * @author Htoo Maung Thait
+     * @since 2023-11-03
+     *
+     * @param int $id
+     * @return json $response
+     */
     public function showUserById($id)
     {
 
         if(!$id){
             $this->setResponseInfo('invalid', 'please provide id', '', '', '');
             return response()->json($this->response, $this->httpStatus);
-        }   
+        }
 
         try{
             $user = $this->userRepository->show($id);
@@ -124,14 +149,21 @@ class UserController extends BaseController
         return response()->json($this->response, $this->httpStatus);
     }
 
+    /**
+     * Update User By Id with role assignment update
+     *
+     * @param Request $request
+     * @param int $id
+     * @return json $response
+     */
     public function updateUserById(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|string|email',
             'role' => 'required|string|exists:roles,name',
-            'password' => 'required|string',
-            'password_confirmation' => 'required|string'
+            'password' => 'string|min:6',
+            'password_confirmation' => 'required_if:password|string|min:6'
         ]);
 
         if($validator->fails()){
@@ -142,25 +174,25 @@ class UserController extends BaseController
         if(!$id){
             $this->setResponseInfo('invalid', 'please provide id', '', '', '');
             return response()->json($this->response, $this->httpStatus);
-        }   
+        }
 
         try{
 
             $validatedData = $validator->validated();
-            
+
             $validatedData['password'] = Hash::make($validatedData['password']);
 
 
             $status = $this->userRepository->updateById($validatedData, $id);
 
             if($status){
-                
+
                 $this->setResponseInfo('success', 'User has been updated successfully!', '', '', '');
             }
             else{
                 $this->setResponseInfo('fail', '', '', '', 'User cannot be updated ! Try later');
             }
-            
+
 
         }catch(Throwable $th)
         {
@@ -173,12 +205,20 @@ class UserController extends BaseController
 
     }
 
+    /**
+     * User delete by id
+     * @author Htoo Maung Thait
+     * @since 2023-11-03
+     *
+     * @param int $id
+     * @return json $response
+     */
     public function deleteById($id)
     {
         if(!$id){
             $this->setResponseInfo('invalid', '', 'please provide id', '', '');
             return response()->json($this->response, $this->httpStatus);
-        }   
+        }
 
         try{
 
@@ -199,6 +239,16 @@ class UserController extends BaseController
         return response()->json($this->response, $this->httpStatus);
     }
 
+
+    /**
+     * Search User by fields
+     *
+     * @author Htoo Maung Thait
+     * @since 2023-11-03
+     *
+     * @param Request $request
+     * @return void
+     */
     public function searchByFields(Request $request)
     {
         try{

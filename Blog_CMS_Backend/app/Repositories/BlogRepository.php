@@ -8,6 +8,14 @@ use App\Repositories\Interfaces\BlogRepositoryInterface;
 
 class BlogRepository implements BlogRepositoryInterface
 {
+    /**
+     * get all users with pagination and optional custom search
+     *
+     * @param [type] $page
+     * @param [type] $limit
+     * @param [type] $search
+     * @return void
+     */
     public function getAll($page, $limit, $search)
     {
         $query = Blog::with(['user']);

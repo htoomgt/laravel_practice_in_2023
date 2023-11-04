@@ -3,13 +3,24 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Schema;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function all($page, $limit)
+    public function all($page, $limit, $search)
     {
-        return User::all();
+        $query =  User::with(['roles']);
+
+        foreach($search as $key => $value){
+
+            if(Schema::table('users', $key)){
+                $query->where($key, 'like', "%".$value."%");
+            }
+
+        }
+
+        return $query->paginate($limit, ['*'], 'page', $page);
     }
 
     public function create(array $data)
@@ -20,7 +31,7 @@ class UserRepository implements UserRepositoryInterface
     public function updateById(array $data, int $id)
     {
         $user = User::find($id);
-        
+
         $role = $data['role'];
         data_forget($data, 'role');
         $user->syncRoles([$role]);

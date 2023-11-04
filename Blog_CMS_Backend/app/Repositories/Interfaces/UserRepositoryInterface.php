@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface UserRepositoryInterface
 {
-    public function all($page, $limit);
+    public function all($page, $limit, $search);
 
     public function create(array $data);
 
