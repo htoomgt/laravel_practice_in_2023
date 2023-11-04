@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('title', 512);
             $table->string('short_content', 512);
             $table->string('content_body', 4096);
-            $table->string('image_file_name', 512);
+            $table->string('image_file', 512);
             $table->enum('status', ['draft', 'published', 'archived']);
-            $table->foreignId('user_id')->constrained('users', 'id');
+            $table->foreignId('author_id')->constrained('users', 'id');
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });
