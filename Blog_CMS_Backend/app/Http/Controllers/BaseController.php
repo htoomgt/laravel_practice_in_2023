@@ -39,10 +39,10 @@ abstract class BaseController extends Controller
             $this->response['status'] = 'success';
             $this->httpStatus = Response::HTTP_OK;
             $this->response['messages'] = array_merge($this->response['messages'], ['request_msg' => $custom_request_success_msg]);
-        } elseif ($result_status == 'invalid') {
+        } elseif ($result_status == 'unauthorized') {
             $this->response['status'] = 'unauthorized';
             $this->httpStatus = Response::HTTP_UNAUTHORIZED;
-            $this->response['messages'] = array_merge($this->response['messages'], $custom_invalid_msg);
+            $this->response['messages'] = array_merge($this->response['messages'], [ 'request_msg' => $custom_request_fail_msg]);            
         }elseif ($result_status == 'invalid') {
             $this->response['status'] = 'invalid';
             $this->httpStatus = Response::HTTP_UNPROCESSABLE_ENTITY;

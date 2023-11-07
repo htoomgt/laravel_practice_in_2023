@@ -29,7 +29,7 @@ class AuthController extends BaseController
      * @since 2023-11-02
      * @param Request $request
      * @return JSON
-     * 
+     *
      */
     public function subscriberRegister(Request $request)
     {
@@ -75,7 +75,7 @@ class AuthController extends BaseController
             $this->setResponseInfo('error', '', '', '', $th->getMessage());
         }
 
-        
+
 
 
         return response()->json($this->response, $this->httpStatus);
@@ -90,30 +90,31 @@ class AuthController extends BaseController
      */
     public function login(Request $request)
     {
-        
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|string',
             'password' => 'required|string'
         ]);
 
         if($validator->fails()){
-            $this->setResponseInfo('invalid', $validator->errors(), '', '', '');
+            $this->setResponseInfo('invalid', '', $validator->errors(), '', '');
             return response()->json($this->response, $this->httpStatus);
         }
 
 
 
         try{
-            $user =  $this->userRepository->getBySearchFields(['email' => $request->email])->first(); 
+            $user =  $this->userRepository->getBySearchFields(['email' => $request->email])->first();
 
             if (!$user || !Hash::check($request['password'], $user->password)) {
-                
-                $this->setResponseInfo('invalid', '', '', '', 'email or password wrongs');
+
+                $this->setResponseInfo('unauthorized', '', '', '', 'email or passwords wrong');
+
                 return response()->json($this->response, $this->httpStatus);
 
             }
 
-            
+
             $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
             $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
 
@@ -129,10 +130,10 @@ class AuthController extends BaseController
 
             $this->setResponseInfo('success', 'User can login successfully!', '', '', '');
         }catch(Throwable $th){
-            $this->setResponseInfo('error', '', '', '', $th->getMessage());
+            $this->setResponseInfo('error', '', [], '', $th->getMessage());
         }
 
-        
+
 
 
         return response()->json($this->response, $this->httpStatus);
@@ -167,7 +168,7 @@ class AuthController extends BaseController
         $user = auth()->user();
 
         try{
-            
+
 
             $accessToken = $user->createToken('access_token', [config('sanctum.token_ability.access_api')], new DateTime(config('sanctum.expiration'). " minutes"))->plainTextToken;
             $refreshToken = $user->createToken('refresh_token', [config('sanctum.token_ability.issue_access_token')], new DateTime(config('sanctum.rt_expiration'). " minutes"))->plainTextToken;
