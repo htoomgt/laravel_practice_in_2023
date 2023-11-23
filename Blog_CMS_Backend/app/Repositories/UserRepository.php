@@ -51,7 +51,9 @@ class UserRepository implements UserRepositoryInterface
 
     public function getBySearchFields($searchData)
     {
-        return User::with(['roles'])->where($searchData)->get();
+        return User::with(['roles' => function($query){
+            return $query->select(['id', 'name']);
+        }])->where($searchData)->get();
     }
 
 }

@@ -105,6 +105,13 @@ class AuthController extends BaseController
 
         try{
             $user =  $this->userRepository->getBySearchFields(['email' => $request->email])->first();
+            $user = $user->makeHidden(['created_at', 'updated_at']);
+
+            foreach($user->roles as $role){
+                unset($role->pivot);
+            }
+            
+            
 
             if (!$user || !Hash::check($request['password'], $user->password)) {
 
